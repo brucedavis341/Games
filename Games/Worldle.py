@@ -2,13 +2,13 @@ import random
 list_of_words = ['money','carry','parry','paris']
 random = random.randint(0,len(list_of_words)-1)
 hidden_words = []
-hidden_word = '_____'
 actual_word = list_of_words[random]
 tries = 0
 
 def gameScreen():
     global hidden_word
     global hidden_words
+    hidden_word = '_____'
     hidden_word = checkGuess(guess,hidden_word)
     print('Let\'s see if any letters got revealed')
     hidden_words.append(hidden_word)
