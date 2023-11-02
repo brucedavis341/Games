@@ -1,91 +1,71 @@
 import random
+from termcolor import colored
 list_of_words = ['money','carry','parry','paris']
 random = random.randint(0,len(list_of_words)-1)
-hidden_words = []
-actual_word = list_of_words[random]
+guessed_words = ['_|_|_|_|_','_|_|_|_|_','_|_|_|_|_','_|_|_|_|_','_|_|_|_|_',]
+answer = list_of_words[random]
+guess = ''
 tries = 0
 
 def gameScreen():
-    global hidden_word
-    global hidden_words
-    hidden_word = '_____'
-    hidden_word = checkGuess(guess,hidden_word)
+    global guessed_words
     print('Let\'s see if any letters got revealed')
-    hidden_words.append(hidden_word)
-    for i in range(0,len(hidden_words)):
-        print('\t', '[' + hidden_words[i] + ']')
+    for i in range(0,len(guessed_words)):
+        print('\t', '[' + guessed_words[i] + ']')
 
-def addLetter(hidden_word,guess,index):
-    return hidden_word[:index] + guess[index] + hidden_word[index:len(hidden_word)-1]
-
-def sameLetter(hidden_word, n):
-    return hidden_word[:n] + '_' + hidden_word[n:len(hidden_word)-1]
-
-def checkGuess(guess,hidden_word):
-    for index in range(0,len(hidden_word)):
-        if guess[index] == actual_word[index] and guess[index] != hidden_word[index]:
-            hidden_word = addLetter(hidden_word,guess,index)
-        elif hidden_word[index] == actual_word[index] and guess[index] == hidden_word[index]:
-            pass
-        elif hidden_word[index] == actual_word[index] and guess[index] != hidden_word[index]:
-            pass
+def checkGuess(guess,answer):
+    new_word = ''
+    for i in range(len(answer)):
+        if i != len(answer)-1:
+            if guess[i] == answer[i]:
+                new_word += colored(guess[i].upper(), 'green', attrs=["bold"]) + '|'
+            elif guess[i] != answer[i] and guess[i] in answer:
+                new_word += colored(guess[i].upper(), 'yellow', attrs=["bold"]) + '|'
+            else:
+                new_word += colored(guess[i].upper(), 'red', attrs=["bold"]) + '|'
         else:
-            hidden_word = sameLetter(hidden_word, index)
-    return hidden_word
+            if guess[i] == answer[i]:
+                new_word += colored(guess[i].upper(), 'green', attrs=["bold"])
+            elif guess[i] != answer[i] and guess[i] in answer:
+                new_word += colored(guess[i].upper(), 'yellow', attrs=["bold"])
+            else:
+                new_word += colored(guess[i].upper(), 'red', attrs=["bold"])
+    return new_word
+    
 
-def manyGuesses():
-    global tries
-    global guess
-    global early_game
-    global hidden_word
-    global hidden_words
-    while tries < 5:
-        if tries == 0:
-            print('Okay here\'s your first guess.')
-            guess = input('What do you think the word is? ')
-            if len(guess) > 5 or len(guess) < 5:
-                print('IT can be more than or less than five letter, and guess a number if you want.\nNot my fault if you lose.')
-                guess = ''
-                manyGuesses()
-            else:
-                gameScreen()
-                if hidden_word == actual_word:
-                    print(' You guessed the word, you must be real good!')
-                    tries = 5
-                    early_game = 5
-                    break
-                else:
-                    tries += 1
-                    manyGuesses()
-        elif tries >= 1:
-            print('Let\'s try another guess.')
-            guess = input('What do you think the word is? ')
-            if len(guess) > 5:
-                print('IT can be more than or less than five letter, and guess a number if you want.\nNot my fault if you lose.')
-                guess = ''
-                manyGuesses()
-            else:
-                gameScreen()
-                if hidden_word == actual_word:
-                    print('You guessed the word, you must be real good!')
-                    tries = 5
-                    early_game = 5
-                    break
-                else:
-                    tries += 1
-                    manyGuesses()
-    if hidden_words == actual_word and tries == 5 and early_game == 0:
-        print('You guessed the word!')
-    elif hidden_words != actual_word and tries == 5 and early_game == 0:
-        print('Dang, you didnt guessed the word')
-    else:
-        pass
+
+def manyGuesses(tries):
+    while tries != 4:
+        guess = input('What do you think the word is? ')
+        if len(guess) > 5:
+            print('Too many letters; only five!')
+            manyGuesses()
+        elif len(guess) < 5:
+            print('Too little letters; only five!')
+            manyGuesses(tries)
+        else:
+            guessed_words[tries] = checkGuess(guess,answer)
+            gameScreen()
+        if guess == answer:
+            print('You win, great job!!!')
+            break
+        tries += 1
+    if tries == 4:
+        print('You lose, good try I guess.') 
+
+
+
 
 def Game():
     print('\t\t\tWelcome to my Wordle Game')
     print('Rules')
     print('Guess the word with only in five letter intervals')
-    print('Here is the word; sorry its hidden!!!\n','\t', '[' + hidden_word + ']')
-    manyGuesses()
+    print('Here is the word; sorry its hidden!!!\n','\t', '[_____]')
+    manyGuesses(tries)
+    replay = input('Do you want to play again?(Y/N) ')
+    if replay.upper == 'Y':
+        Game()
+    else:
+        print('Thanks for playing!!!')
 
 Game()
